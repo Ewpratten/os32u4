@@ -10,15 +10,16 @@ namespace uart {
 enum class BaudRate { k2400, k9600, k38400 };
 
 void init(BaudRate rate);
+void redirectSTDIO();
 
 // Get and Put
-void putc(char c, FILE *stream);
-void getc(FILE *stream __attribute__((unused)));
+void putch(char c);
+char getch();
 
 // alternate streams to use for serial io
-namespace streams {
-FILE output;
-FILE input;
+namespace stream {
+void putch(char c, FILE *stream);
+char getch(FILE *stream __attribute__((unused)));
 }  // namespace streams
 
 }  // namespace uart

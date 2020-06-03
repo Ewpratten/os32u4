@@ -1,9 +1,10 @@
 /**
  * The following documents help a lot with porting my os328 UART code to 32u4
  * boards:
- * 
+ *
  *  - https://appelsiini.net/2011/simple-usart-with-avr-libc/
- *  - https://arduino.stackexchange.com/questions/19355/uart-error-can-not-compile-on-arduino-yun-atmega32u4
+ *  -
+ * https://arduino.stackexchange.com/questions/19355/uart-error-can-not-compile-on-arduino-yun-atmega32u4
  *  - https://cache.amobbs.com/bbs_upload782111/files_22/ourdev_508497.html
  *  - https://www.avrfreaks.net/forum/fdevsetupstream-c
  */
@@ -85,35 +86,59 @@ void init(BaudRate rate) {
             break;
         }
     }
-
-    // Configure streams
-    streams::output.put = (int (*)(char, __file *))putc;
-    streams::output.get = nullptr;
-    streams::output.flags = _FDEV_SETUP_WRITE;
-    streams::input.put = nullptr;
-    streams::input.get = getc;
-    streams::input.flags = _FDEV_SETUP_READ;
-
-    // Overwrite default streams
-    stdout = &uart_output;
-    stdin = &uart_input;
 }
 
-void putc(char c, FILE *stream) {
+void redirectSTDIO() {
+    // Configure streams
+    FILE output;
+    output.put = (int (*)(char, __file *))stream::putch;
+    output.get = nullptr;
+    output.flags = _FDEV_SETUP_WRITE;
+
+    FILE input;
+    input.put = nullptr;
+    input.get = (int (*)(__file*))stream::getch;
+    input.flags = _FDEV_SETUP_READ;
+
+    // Overwrite default streams
+    stdout = &output;
+    stdin = &input;
+}
+
+void putch(char c) {
     if (c == '\n') {
-        uart_putchar('\r', stream);
+        putch('\r');
     }
 
     // Wait for data
-    loop_until_bit_is_set(UCSR0A, UDRE0);
-    UDR0 = c;
+    loop_until_bit_is_set(UCSR1A, UDRE1);
+    UDR1 = c;
 }
 
-void getc(FILE *stream __attribute__((unused))) {
+char getch() {
     // Wait for data
-    loop_until_bit_is_set(UCSR0A, RXC0);
-    return UDR0;
+    loop_until_bit_is_set(UCSR1A, RXC1);
+    return UDR1;
 }
 
+namespace stream {
+
+void putch(char c, FILE *stream) {
+    if (c == '\n') {
+        putch('\r', stream);
+    }
+
+    // Wait for data
+    loop_until_bit_is_set(UCSR1A, UDRE1);
+    UDR1 = c;
+}
+
+char getch(FILE *stream __attribute__((unused))) {
+    // Wait for data
+    loop_until_bit_is_set(UCSR1A, RXC1);
+    return UDR1;
+}
+
+}  // namespace streams
 }  // namespace uart
 }  // namespace stdavr
