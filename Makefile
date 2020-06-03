@@ -2,6 +2,7 @@
 
 # Board
 avrType=atmega32u4
+clibtype=__AVR_ATmega32U4__
 
 # CPU clock speed
 avrFreq=8000000 # 16 Mhz
@@ -17,7 +18,7 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-CPPFLAGS=-DF_CPU=$(avrFreq) -mmcu=$(avrType) -Iinclude -std=c++11
+CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11
 # -Wall -Werror -Wextra 
 objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
 
