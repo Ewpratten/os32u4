@@ -17,7 +17,7 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-cflags=-DF_CPU=$(avrFreq) -mmcu=$(avrType) -Iinclude -std=c++11
+CPPFLAGS=-DF_CPU=$(avrFreq) -mmcu=$(avrType) -Iinclude -std=c++11
 # -Wall -Werror -Wextra 
 objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
 
@@ -26,22 +26,24 @@ objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
 all: build/main.hex
 
 %.o: %.c
-	$(CXX) $(cflags) -c $< -o $@
+	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 build/main.elf: $(objects)
-	$(CXX) $(cflags) -o $@ $^ 
+	$(CXX) $(CPPFLAGS) -o $@ $^ 
 
 build/main.hex: build/main.elf
 	avr-objcopy -j .text -j .data -O ihex $^ $@
 
 flash: build/main.hex
 	sudo systemctl stop ModemManager.service
+
+	python2 bootloader.py $(programmerDev)
 	
-	sudo stty -F $(programmerDev) speed 1200
-	sudo stty -F $(programmerDev) speed $(baud)
+	# sudo stty -F $(programmerDev) speed 1200
+	# sudo stty -F $(programmerDev) speed $(baud)
 
 	sleep 2
-	sudo avrdude -p$(avrType) -c$(programmerType) -P$(programmerDev) -b$(baud) -v -U flash:w:$<:i
+	sudo avrdude -p$(avrType) -c$(programmerType) -P $(programmerDev) -b$(baud) -v -D -U flash:w:$<:i
 
 clean:
 	rm -f build/*
