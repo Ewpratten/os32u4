@@ -5,7 +5,7 @@ avrType=atmega32u4
 clibtype=__AVR_ATmega32U4__
 
 # CPU clock speed
-avrFreq=8000000 # 16 Mhz
+avrFreq=16000000
 
 # Linux port
 programmerDev=/dev/ttyACM*
@@ -18,7 +18,7 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11
+CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11 -w -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -lm
 # -Wall -Werror -Wextra 
 objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
 
@@ -33,10 +33,12 @@ build/main.elf: $(objects)
 	$(CXX) $(CPPFLAGS) -o $@ $^ 
 
 build/main.hex: build/main.elf
-	avr-objcopy -j .text -j .data -O ihex $^ $@
+	# avr-objcopy -j .text -j .data -O ihex $^ $@
+
+	avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $^ $@.eep
+	avr-objcopy -O ihex -R .eeprom $^ $@
 
 flash: build/main.hex
-	sudo systemctl stop ModemManager.service
 
 	python2 bootloader.py $(programmerDev)
 	
@@ -44,7 +46,8 @@ flash: build/main.hex
 	# sudo stty -F $(programmerDev) speed $(baud)
 
 	sleep 2
-	sudo avrdude -p$(avrType) -c$(programmerType) -P $(programmerDev) -b$(baud) -v -D -U flash:w:$<:i
+	avr-size -A build/main.elf
+	sudo avrdude -p$(avrType) -c$(programmerType) -P $(programmerDev) -b$(baud) -v -D -U flash:w:$<:i -U eeprom:w:$<.eep
 
 clean:
 	rm -f build/*

@@ -24,16 +24,17 @@ int main(int argc, char const* argv[]) {
 
     // Configure a pin
     printf("Configuring board pin 9 for output");
-    stdavr::gpio::pin::configure(stdavr::gpio::PinBank::kDigital, 9,
+    stdavr::gpio::pin::configure(stdavr::gpio::PinBank::kDigital, 12,
                                  stdavr::gpio::PinMode::kOutput);
 
     // Write voltage to pin
     printf("Pulling pin 9 HIGH");
-    stdavr::gpio::pin::binaryWrite(stdavr::gpio::PinBank::kDigital, 9, true);
+    stdavr::gpio::pin::binaryWrite(stdavr::gpio::PinBank::kDigital, 12, true);
 
     // Do nothing
     printf("System idle");
-    for (;;) {
-    }
+    // for (;;) {
+    // }
+
     return 0;
 }
