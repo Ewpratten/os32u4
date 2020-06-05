@@ -18,7 +18,8 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11 -w -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -lm
+CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11  -g -Os -w  -fdata-sections -MMD -flto
+LINKFLAGS=-w -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -mmcu=$(avrType) -Iinclude -std=c++11 -DF_CPU=$(avrFreq)
 # -Wall -Werror -Wextra 
 objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
 
@@ -30,30 +31,41 @@ all: build/main.hex
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 build/main.elf: $(objects)
-	$(CXX) $(CPPFLAGS) -o $@ $^ 
+	$(CXX) $(LINKFLAGS) -o $@ $^ 
 
 build/main.hex: build/main.elf
-	# avr-objcopy -j .text -j .data -O ihex $^ $@
-
 	avr-objcopy -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 $^ $@.eep
 	avr-objcopy -O ihex -R .eeprom $^ $@
 
 flash: build/main.hex
 
-	python2 bootloader.py $(programmerDev)
+	@echo "Requesting sudo access"
+	@sudo echo "Done"
+	
+	@echo "Please reset your chip"
+	until  ls /dev/tty* | grep ACM ; do sleep 0.5; done
+
+	# sleep 2
+	# sudo python2 bootloader.py $(programmerDev)
 	
 	# sudo stty -F $(programmerDev) speed 1200
 	# sudo stty -F $(programmerDev) speed $(baud)
 
 	sleep 2
 	avr-size -A build/main.elf
-	sudo avrdude -p$(avrType) -c$(programmerType) -P $(programmerDev) -b$(baud) -v -D -U flash:w:$<:i -U eeprom:w:$<.eep
+	sudo avrdude -p$(avrType) -c$(programmerType) -P $(programmerDev) -b$(baud) -v -U flash:w:$<:i -U eeprom:w:$<.eep
 
 clean:
 	rm -f build/*
 
 connect:
-	screen $(programmerDev) $(commsBaud)
+	@echo "Requesting sudo access"
+	@sudo echo "Done"
+	
+	@echo "Please reset your chip"
+	until  ls /dev/tty* | grep ACM ; do sleep 0.5; done
+
+	sudo screen $(programmerDev) $(commsBaud)
 
 finddevices:
 	ls /dev/ttyACM*

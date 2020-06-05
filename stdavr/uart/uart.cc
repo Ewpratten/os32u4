@@ -7,6 +7,7 @@
  * https://arduino.stackexchange.com/questions/19355/uart-error-can-not-compile-on-arduino-yun-atmega32u4
  *  - https://cache.amobbs.com/bbs_upload782111/files_22/ourdev_508497.html
  *  - https://www.avrfreaks.net/forum/fdevsetupstream-c
+ *  - https://www.avrfreaks.net/forum/atmega32u4-serial-communication-question
  */
 
 #include <avr/io.h>
@@ -97,7 +98,7 @@ void redirectSTDIO() {
 
     FILE input;
     input.put = nullptr;
-    input.get = (int (*)(__file*))stream::getch;
+    input.get = (int (*)(__file *))stream::getch;
     input.flags = _FDEV_SETUP_READ;
 
     // Overwrite default streams
@@ -123,22 +124,12 @@ char getch() {
 
 namespace stream {
 
-void putch(char c, FILE *stream) {
-    if (c == '\n') {
-        putch('\r', stream);
-    }
-
-    // Wait for data
-    loop_until_bit_is_set(UCSR1A, UDRE1);
-    UDR1 = c;
-}
+void putch(char c, FILE *stream) { stdavr::uart::putch(c); }
 
 char getch(FILE *stream __attribute__((unused))) {
-    // Wait for data
-    loop_until_bit_is_set(UCSR1A, RXC1);
-    return UDR1;
+    return stdavr::uart::getch();
 }
 
-}  // namespace streams
+}  // namespace stream
 }  // namespace uart
 }  // namespace stdavr
