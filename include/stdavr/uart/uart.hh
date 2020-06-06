@@ -6,8 +6,8 @@
 namespace stdavr {
 namespace uart {
 
-// Baud rate
-enum class BaudRate { k2400, k9600, k38400 };
+// Baud rate / 100
+enum class BaudRate { k2400 = 24, k9600 = 96, k38400 = 384 };
 
 void init(BaudRate rate);
 void redirectSTDIO();
@@ -20,7 +20,7 @@ char getch();
 namespace stream {
 void putch(char c, FILE *stream);
 char getch(FILE *stream __attribute__((unused)));
-}  // namespace streams
+}  // namespace stream
 
 }  // namespace uart
 }  // namespace stdavr

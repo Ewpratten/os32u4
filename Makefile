@@ -7,8 +7,9 @@ clibtype=__AVR_ATmega32U4__
 # CPU clock speed
 avrFreq=16000000
 
-# Linux port
+# Linux ports
 programmerDev=/dev/ttyACM*
+serialDev=/dev/ttyUSB*
 
 # Other
 baud=57600
@@ -43,7 +44,7 @@ flash: build/main.hex
 	@sudo echo "Done"
 	
 	@echo "Please reset your chip"
-	until  ls /dev/tty* | grep ACM ; do sleep 0.5; done
+	until  ls $(programmerDev) 2> /dev/null; do sleep 0.5; done
 
 	# sleep 2
 	# sudo python2 bootloader.py $(programmerDev)
@@ -63,9 +64,9 @@ connect:
 	@sudo echo "Done"
 	
 	@echo "Please reset your chip"
-	until  ls /dev/tty* | grep ACM ; do sleep 0.5; done
+	until  ls $(serialDev) 2> /dev/null; do sleep 0.5; done
 
-	sudo screen $(programmerDev) $(commsBaud)
+	sudo screen $(serialDev) $(commsBaud)
 
 finddevices:
 	ls /dev/ttyACM*

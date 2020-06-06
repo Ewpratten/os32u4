@@ -13,6 +13,7 @@
 #include <avr/io.h>
 
 #include <stdavr/uart/uart.hh>
+#include <vendor/promicro/pins_arduino.h>
 
 static void _init_uart_2400() {
 #undef BAUD  // avoid compiler warning
@@ -68,6 +69,7 @@ static void _init_uart_38400() {
     UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
 }
 
+
 namespace stdavr {
 namespace uart {
 
@@ -86,7 +88,13 @@ void init(BaudRate rate) {
             _init_uart_38400();
             break;
         }
+        default:{
+            _init_uart_9600();
+        }
     }
+
+    // Init I/O leds
+    TX_RX_LED_INIT;
 }
 
 void redirectSTDIO() {
@@ -109,6 +117,13 @@ void redirectSTDIO() {
 void putch(char c) {
     if (c == '\n') {
         putch('\r');
+    }
+
+    // Handle LED
+    if(c == '\r'){
+        TXLED0;
+    }else{
+        TXLED1;
     }
 
     // Wait for data
