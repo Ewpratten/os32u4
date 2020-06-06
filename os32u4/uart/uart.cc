@@ -13,16 +13,16 @@
 #include <avr/io.h>
 #include <vendor/promicro/pins_arduino.h>
 
-#include <stdavr/uart/baudutil.hh>
-#include <stdavr/uart/uart.hh>
+#include <os32u4/uart/baudutil.hh>
+#include <os32u4/uart/uart.hh>
 
-namespace stdavr {
+namespace os {
 namespace uart {
 
 void init(BaudRate rate) {
     // Configure BAUD
     // NOTE: the BaudRate enum contains baud/100. Must multiply to get baud
-    unsigned long ubrr = stdavr::uart::baudutil::calcUBRR((int)rate * 100);
+    unsigned long ubrr = os::uart::baudutil::calcUBRR((int)rate * 100);
     UBRR1H = (unsigned char)(ubrr >> 8);
     UBRR1L = (unsigned char)ubrr;
 
@@ -84,12 +84,12 @@ char getch() {
 namespace stream {
 
 int putch(char c, FILE *stream) {
-    stdavr::uart::putch(c);
+    os::uart::putch(c);
     return 1;
 }
 
 int getch(FILE *stream __attribute__((unused))) {
-    return stdavr::uart::getch();
+    return os::uart::getch();
 }
 
 }  // namespace stream

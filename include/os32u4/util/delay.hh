@@ -1,9 +1,9 @@
-#if !defined(_STDAVE_UTIL_DELAY_HH)
-#define _STDAVE_UTIL_DELAY_HH
+#if !defined(_OS_UTIL_DELAY_HH)
+#define _OS_UTIL_DELAY_HH
 
 #include <util/delay.h>
 
-namespace stdavr {
+namespace os {
 namespace util {
 namespace delay {
 
@@ -12,6 +12,6 @@ void delayS(unsigned int s);
 
 }  // namespace delay
 }  // namespace util
-}  // namespace stdavr
+}  // namespace os
 
 #endif  // _STDAVE_UTIL_DELAY_HH

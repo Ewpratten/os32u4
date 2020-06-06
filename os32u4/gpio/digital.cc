@@ -1,6 +1,6 @@
-#include "stdavr/gpio/pin.hh"
+#include "os32u4/gpio/pin.hh"
 
-namespace stdavr {
+namespace os {
 namespace gpio {
 namespace pin {
 
@@ -67,20 +67,20 @@ void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
 bool binaryRead(PinBank bank, unsigned int id) {
     uint8_t pin = toArduinoPin(bank, id);
     uint8_t timer = digitalPinToTimer(pin);
-	uint8_t bit = digitalPinToBitMask(pin);
-	uint8_t port = digitalPinToPort(pin);
+    uint8_t bit = digitalPinToBitMask(pin);
+    uint8_t port = digitalPinToPort(pin);
 
-	if (port == 0) return false;
+    if (port == 0) return false;
 
-	// If the pin that support PWM output, we need to turn it off
-	// before getting a digital reading.
+    // If the pin that support PWM output, we need to turn it off
+    // before getting a digital reading.
     // TODO: Implement PWM before this
-	// if (timer != NOT_ON_TIMER) turnOffPWM(timer);
+    // if (timer != NOT_ON_TIMER) turnOffPWM(timer);
 
-	if (*portInputRegister(port) & bit) return true;
-	return false;
+    if (*portInputRegister(port) & bit) return true;
+    return false;
 }
 
 }  // namespace pin
 }  // namespace gpio
-}  // namespace stdavr
+}  // namespace os
