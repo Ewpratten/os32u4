@@ -35,6 +35,8 @@ void init(BaudRate rate) {
 
     // Init I/O leds
     TX_RX_LED_INIT;
+    TXLED1;
+    RXLED1;
 }
 
 void redirectSTDIO() {
@@ -56,10 +58,10 @@ void putch(char c) {
     }
 
     // Handle LED
-    TXLED1;
-    // if (c == '\n') {
-    //     TXLED0;
-    // }
+    TXLED0;
+    if (c == '\n') {
+        TXLED1;
+    }
 
     // Wait for data
     loop_until_bit_is_set(UCSR1A, UDRE1);
@@ -73,10 +75,10 @@ char getch() {
     char c = UDR1;
 
     // Handle LED
-    RXLED1;
-    // if (c == '\n') {
-    //     RXLED0;
-    // }
+    RXLED0;
+    if (c == '\n') {
+        RXLED1;
+    }
 
     return c;
 }
