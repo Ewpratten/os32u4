@@ -1,9 +1,9 @@
-#if !defined(_STDAVR_UART_UART_HH)
-#define _STDAVR_UART_UART_HH
+#if !defined(_OS_UART_UART_HH)
+#define _OS_UART_UART_HH
 
 #include <stdio.h>
 
-namespace stdavr {
+namespace os {
 namespace uart {
 
 // Baud rate / 100
@@ -23,6 +23,6 @@ int getch(FILE *stream __attribute__((unused)));  // namespace stream
 
 }  // namespace stream
 }  // namespace uart
-}
+}  // namespace os
 
 #endif  // _STDAVR_UART_UART_HH

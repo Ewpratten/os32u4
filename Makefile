@@ -22,7 +22,7 @@ CXX=avr-g++
 CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11  -g -Os -w  -fdata-sections -MMD -flto
 LINKFLAGS=-w -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -mmcu=$(avrType) -Iinclude -std=c++11 -DF_CPU=$(avrFreq)
 # -Wall -Werror -Wextra 
-objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) stdavr/**/*.cc
+objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) os32u4/**/*.cc
 
 .PHONY: flash clean
 

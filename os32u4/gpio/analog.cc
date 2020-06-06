@@ -1,11 +1,11 @@
-#include "stdavr/gpio/pin.hh"
+#include "os32u4/gpio/pin.hh"
 
 // TODO: PWM requires a lot of other board features to be implemented first
 
 // Board internal ref voltage
-uint8_t analog_reference = (uint8_t)stdavr::gpio::ReferenceVoltage::kDefault;
+uint8_t analog_reference = (uint8_t)os::gpio::ReferenceVoltage::kDefault;
 
-namespace stdavr {
+namespace os {
 namespace gpio {
 namespace pin {
 
@@ -28,4 +28,4 @@ int analogRead(PinBank bank, unsigned int id) { return 0; }
 
 }  // namespace pin
 }  // namespace gpio
-}  // namespace stdavr
+}  // namespace os

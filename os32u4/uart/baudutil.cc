@@ -1,10 +1,10 @@
-#include <stdavr/uart/baudutil.hh>
+#include <os32u4/uart/baudutil.hh>
 
 #ifndef F_CPU
 #define F_CPU 16000000
 #endif
 
-namespace stdavr {
+namespace os {
 namespace uart {
 namespace baudutil {
 
@@ -14,4 +14,4 @@ int calcUBRR(unsigned long baud) {
 
 }  // namespace baudutil
 }  // namespace uart
-}  // namespace stdavr
+}  // namespace os

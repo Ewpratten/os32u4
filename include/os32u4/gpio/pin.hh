@@ -1,5 +1,5 @@
-#if !defined(_STDAVR_GPIO_PIN_HH)
-#define _STDAVR_GPIO_PIN_HH
+#if !defined(_OS_GPIO_PIN_HH)
+#define _OS_GPIO_PIN_HH
 
 #include <avr/common.h>
 #include <avr/interrupt.h>
@@ -20,7 +20,7 @@
 #define portModeRegister(P) \
     ((volatile uint8_t *)(pgm_read_word(port_to_mode_PGM + (P))))
 
-namespace stdavr {
+namespace os {
 namespace gpio {
 
 // Pin data
@@ -60,6 +60,6 @@ uint8_t toArduinoPin(PinBank bank, unsigned int id);
 
 }  // namespace pin
 }  // namespace gpio
-}  // namespace stdavr
+}  // namespace os
 
-#endif  // _STDAVR_GPIO_PIN_HH
+#endif  // _OS_GPIO_PIN_HH
