@@ -18,11 +18,11 @@ char getch();
 
 // alternate streams to use for serial io
 namespace stream {
-void putch(char c, FILE *stream);
-char getch(FILE *stream __attribute__((unused)));
-}  // namespace stream
+int putch(char c, FILE *stream);
+int getch(FILE *stream __attribute__((unused)));  // namespace stream
 
+}  // namespace stream
 }  // namespace uart
-}  // namespace stdavr
+}
 
 #endif  // _STDAVR_UART_UART_HH

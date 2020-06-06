@@ -11,87 +11,27 @@
  */
 
 #include <avr/io.h>
-
-#include <stdavr/uart/uart.hh>
 #include <vendor/promicro/pins_arduino.h>
 
-static void _init_uart_2400() {
-#undef BAUD  // avoid compiler warning
-#define BAUD 2400
-#include <util/setbaud.h>
-
-    UBRR1H = UBRRH_VALUE;
-    UBRR1L = UBRRL_VALUE;
-
-#if USE_2X
-    UCSR1A |= _BV(U2X1);
-#else
-    UCSR1A &= ~(_BV(U2X1));
-#endif
-
-    UCSR1C = _BV(UCSZ11) | _BV(UCSZ10); /* 8-bit data */
-    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
-}
-
-static void _init_uart_9600() {
-#undef BAUD  // avoid compiler warning
-#define BAUD 9600
-#include <util/setbaud.h>
-
-    UBRR1H = UBRRH_VALUE;
-    UBRR1L = UBRRL_VALUE;
-
-#if USE_2X
-    UCSR1A |= _BV(U2X1);
-#else
-    UCSR1A &= ~(_BV(U2X1));
-#endif
-
-    UCSR1C = _BV(UCSZ11) | _BV(UCSZ10); /* 8-bit data */
-    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
-}
-
-static void _init_uart_38400() {
-#undef BAUD  // avoid compiler warning
-#define BAUD 38400
-#include <util/setbaud.h>
-
-    UBRR1H = UBRRH_VALUE;
-    UBRR1L = UBRRL_VALUE;
-
-#if USE_2X
-    UCSR1A |= _BV(U2X1);
-#else
-    UCSR1A &= ~(_BV(U2X1));
-#endif
-
-    UCSR1C = _BV(UCSZ11) | _BV(UCSZ10); /* 8-bit data */
-    UCSR1B = _BV(RXEN1) | _BV(TXEN1);   /* Enable RX and TX */
-}
-
+#include <stdavr/uart/baudutil.hh>
+#include <stdavr/uart/uart.hh>
 
 namespace stdavr {
 namespace uart {
 
 void init(BaudRate rate) {
-    // Call appropriate UART init function
-    switch (rate) {
-        case BaudRate::k2400: {
-            _init_uart_2400();
-            break;
-        }
-        case BaudRate::k9600: {
-            _init_uart_9600();
-            break;
-        }
-        case BaudRate::k38400: {
-            _init_uart_38400();
-            break;
-        }
-        default:{
-            _init_uart_9600();
-        }
-    }
+    // Configure BAUD
+    // NOTE: the BaudRate enum contains baud/100. Must multiply to get baud
+    unsigned long ubrr = stdavr::uart::baudutil::calcUBRR((int)rate * 100);
+    UBRR1H = (unsigned char)(ubrr >> 8);
+    UBRR1L = (unsigned char)ubrr;
+
+    // Allow RX and TX
+    UCSR1B = (1 << TXEN1) | (1 << RXEN1);
+
+    // Set data format
+    // 8b of data + 2b stop
+    UCSR1C = (1 << USBS1) | (3 << UCSZ10);
 
     // Init I/O leds
     TX_RX_LED_INIT;
@@ -99,19 +39,15 @@ void init(BaudRate rate) {
 
 void redirectSTDIO() {
     // Configure streams
-    FILE output;
-    output.put = (int (*)(char, __file *))stream::putch;
-    output.get = nullptr;
-    output.flags = _FDEV_SETUP_WRITE;
+    FILE *io;
+    // io.put = (int (*)(char, __file *))stream::putch;
+    // io.get = (int (*)(__file *))stream::getch;
+    // io.flags = _FDEV_SETUP_WRITE | _FDEV_SETUP_READ;
 
-    FILE input;
-    input.put = nullptr;
-    input.get = (int (*)(__file *))stream::getch;
-    input.flags = _FDEV_SETUP_READ;
+    io = fdevopen(stream::putch, stream::getch);
 
     // Overwrite default streams
-    stdout = &output;
-    stdin = &input;
+    stdout = stdin = io;
 }
 
 void putch(char c) {
@@ -120,11 +56,10 @@ void putch(char c) {
     }
 
     // Handle LED
-    if(c == '\r'){
-        TXLED0;
-    }else{
-        TXLED1;
-    }
+    TXLED1;
+    // if (c == '\n') {
+    //     TXLED0;
+    // }
 
     // Wait for data
     loop_until_bit_is_set(UCSR1A, UDRE1);
@@ -134,14 +69,26 @@ void putch(char c) {
 char getch() {
     // Wait for data
     loop_until_bit_is_set(UCSR1A, RXC1);
-    return UDR1;
+
+    char c = UDR1;
+
+    // Handle LED
+    RXLED1;
+    // if (c == '\n') {
+    //     RXLED0;
+    // }
+
+    return c;
 }
 
 namespace stream {
 
-void putch(char c, FILE *stream) { stdavr::uart::putch(c); }
+int putch(char c, FILE *stream) {
+    stdavr::uart::putch(c);
+    return 1;
+}
 
-char getch(FILE *stream __attribute__((unused))) {
+int getch(FILE *stream __attribute__((unused))) {
     return stdavr::uart::getch();
 }
 
