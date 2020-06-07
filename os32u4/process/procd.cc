@@ -7,7 +7,7 @@
 // Info for keeping track of process execution
 typedef struct ProcInfo {
     os::process::Process* proc;
-    double lastCallTime;
+    unsigned long lastCallTime;
     bool frozen;
     bool finished;
 };
@@ -23,6 +23,7 @@ namespace scheduler {
 void runIteration() {
     // Loop through every process
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
+        printf("%d\n", i);
         // If the process is allowed to run
         if (!processes[i].finished && !processes[i].frozen && i < EOP) {
 
@@ -32,19 +33,22 @@ void runIteration() {
                 processes[i].proc->init();
             }
 
-            // puts("Ini");
+
             // Handle starting the timer service if the user forgets
             if(millis_get() == 0.0){
                 millis_init();
             }
+            puts("Read millis");
 
             // Calculate time since last run
-            millis_t now = millis_get();
-            unsigned long dt = processes[i].lastCallTime - now;
+            millis_t now = millis_get() * 2; // Timing is a little odd
+            unsigned long dt = now - processes[i].lastCallTime;
             processes[i].lastCallTime = now;
+            puts("Calculated DT");
 
             // Run an iteration of the process
             processes[i].proc->runIteration(dt);
+            puts("Ran iteration");
 
             // Check if the process has finished
             processes[i].finished = processes[i].proc->isFinished();
@@ -87,7 +91,7 @@ int start(process::Process* proc) {
     pi.proc = proc;
     pi.finished = false;
     pi.frozen = false;
-    pi.lastCallTime = 0.0;
+    pi.lastCallTime = 0l;
     pi.proc->initialized = false;
     processes[slot] = pi;
 

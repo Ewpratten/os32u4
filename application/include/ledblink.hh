@@ -20,7 +20,7 @@ class LEDBlinkProc: public os::process::Process {
      bool value;
      double delay;
      double lastBlinkTime = 0.0;
-     unsigned long timeNow = 0.0;
+     unsigned long timeNow = 0l;
 };
 
 #endif // _APP_LEDBLINK_HH

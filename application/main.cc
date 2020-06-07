@@ -35,8 +35,8 @@ inline void startProc(os::process::Process* p) {
 void procInit() {
     puts("Starting system processes");
 
-    startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 9, 0.5));
-    startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 8, 0.25));
+    startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 9, 500l));
+    // startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 8, 250l));
 }
 
 int main(int argc, char const* argv[]) {
