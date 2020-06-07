@@ -40,7 +40,8 @@ void procInit() {
 }
 
 int main(int argc, char const* argv[]) {
-    // SEI
+    // Disable USB ints and enable global ints
+    USBCON = 0;
     sei();
 
     // Handle boot wipe
