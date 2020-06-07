@@ -23,7 +23,7 @@ namespace scheduler {
 void runIteration() {
     // Loop through every process
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
-        printf("%d\n", i);
+        // printf("%d\n", i);
         // If the process is allowed to run
         if (!processes[i].finished && !processes[i].frozen && i < EOP) {
 
@@ -38,17 +38,17 @@ void runIteration() {
             if(millis_get() == 0.0){
                 millis_init();
             }
-            puts("Read millis");
+            // puts("Read millis");
 
             // Calculate time since last run
             millis_t now = millis_get() * 2; // Timing is a little odd
             unsigned long dt = now - processes[i].lastCallTime;
             processes[i].lastCallTime = now;
-            puts("Calculated DT");
+            // puts("Calculated DT");
 
             // Run an iteration of the process
             processes[i].proc->runIteration(dt);
-            puts("Ran iteration");
+            // puts("Ran iteration");
 
             // Check if the process has finished
             processes[i].finished = processes[i].proc->isFinished();

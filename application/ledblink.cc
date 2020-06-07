@@ -24,7 +24,6 @@ void LEDBlinkProc::init()  {
 void LEDBlinkProc::runIteration(unsigned long dt)  {
     // Update the current time
     this->timeNow += dt;
-    printf("DT: %lu\n", dt);
 
     // Only blink if we have passed the delay time
     if (this->timeNow - this->lastBlinkTime < this->delay) {
