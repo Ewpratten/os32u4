@@ -1,10 +1,11 @@
 #include <ledblink.hh>
 
 
-LEDBlinkProc::LEDBlinkProc(os::gpio::PinBank bank, unsigned int pin, double delay_msec) {
+LEDBlinkProc::LEDBlinkProc(os::gpio::PinBank bank, unsigned int pin, unsigned long delay_msec) {
     this->bank = bank;
     this->pin = pin;
     this->delay = delay_msec;
+
 }
 
 void LEDBlinkProc::init()  {
@@ -20,7 +21,7 @@ void LEDBlinkProc::init()  {
     this->value = true;
 }
 
-void LEDBlinkProc::runIteration(double dt)  {
+void LEDBlinkProc::runIteration(unsigned long dt)  {
     // Update the current time
     this->timeNow += dt;
 
@@ -36,7 +37,7 @@ void LEDBlinkProc::runIteration(double dt)  {
     this->value = !this->value;
 
     // Log
-    printf("Pin %d set %s\n", this->pin,(this->value) ? "HIGH" : "LOW");
+    printf("Pin %d set %s\n", this->pin, (this->value) ? "HIGH" : "LOW");
 
     // Write to pin
     os::gpio::pin::binaryWrite(this->bank, this->pin, this->value);

@@ -19,7 +19,7 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-common_flags=-DMILLIS_TIMER=1 -mmcu=$(avrType) -Iinclude -Iapplication/include -std=c++11  -DF_CPU=$(avrFreq) -w -Os -g -flto -DBAUD=$(commsBaud)
+common_flags=-DMILLIS_TIMER=0 -DTIMER0_COMPA_vect -mmcu=$(avrType) -Iinclude -Iapplication/include -std=c++11  -DF_CPU=$(avrFreq) -w -Os -g -flto -DBAUD=$(commsBaud) -Wall -Wextra
 CPPFLAGS=-D $(clibtype)   -std=c++11 -lang-c++  -fdata-sections -MMD $(common_flags)
 ASMFLAGS=-x assembler-with-cpp
 LINKFLAGS= -fuse-linker-plugin -Wl,--gc-sections  $(common_flags)
@@ -64,6 +64,7 @@ flash: build/main.hex
 
 clean:
 	rm -f build/*
+	rm main.o main.d || true
 
 connect:
 	@echo "Requesting sudo access"

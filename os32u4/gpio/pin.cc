@@ -4,7 +4,7 @@ namespace os {
 namespace gpio {
 namespace pin {
 
-uint8_t toArduinoPin(PinBank bank, unsigned int id) {
+unsigned char toArduinoPin(PinBank bank, unsigned int id) {
     if (bank == PinBank::kAnalog) {
         return A0 + id;
     } else {

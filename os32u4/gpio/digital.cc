@@ -1,14 +1,15 @@
 #include "os32u4/gpio/pin.hh"
+#include <os32u4/util/fixes.hh>
 
 namespace os {
 namespace gpio {
 namespace pin {
 
 void configure(PinBank bank, unsigned int id, PinMode mode) {
-    uint8_t pin = toArduinoPin(bank, id);
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
-    volatile uint8_t *reg, *out;
+    unsigned char pin = toArduinoPin(bank, id);
+    unsigned char bit = digitalPinToBitMask(pin);
+    unsigned char port = digitalPinToPort(pin);
+    volatile unsigned char *reg, *out;
 
     if (port == 0) return;
 
@@ -17,19 +18,19 @@ void configure(PinBank bank, unsigned int id, PinMode mode) {
     out = portOutputRegister(port);
 
     if (mode == PinMode::kInput) {
-        uint8_t oldSREG = SREG;
+        unsigned char oldSREG = SREG;
         cli();
         *reg &= ~bit;
         *out &= ~bit;
         SREG = oldSREG;
     } else if (mode == PinMode::kInputPullup) {
-        uint8_t oldSREG = SREG;
+        unsigned char oldSREG = SREG;
         cli();
         *reg &= ~bit;
         *out |= bit;
         SREG = oldSREG;
     } else {
-        uint8_t oldSREG = SREG;
+        unsigned char oldSREG = SREG;
         cli();
         *reg |= bit;
         SREG = oldSREG;
@@ -37,11 +38,11 @@ void configure(PinBank bank, unsigned int id, PinMode mode) {
 }
 
 void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
-    uint8_t pin = toArduinoPin(bank, id);
-    uint8_t timer = digitalPinToTimer(pin);
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
-    volatile uint8_t *out;
+    unsigned char pin = toArduinoPin(bank, id);
+    unsigned char timer = digitalPinToTimer(pin);
+    unsigned char bit = digitalPinToBitMask(pin);
+    unsigned char port = digitalPinToPort(pin);
+    volatile unsigned char *out;
 
     if (port == 0) return;
 
@@ -52,7 +53,7 @@ void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
 
     out = portOutputRegister(port);
 
-    uint8_t oldSREG = SREG;
+    unsigned char oldSREG = SREG;
     cli();
 
     if (enabled == false) {
@@ -65,10 +66,10 @@ void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
 }
 
 bool binaryRead(PinBank bank, unsigned int id) {
-    uint8_t pin = toArduinoPin(bank, id);
-    uint8_t timer = digitalPinToTimer(pin);
-    uint8_t bit = digitalPinToBitMask(pin);
-    uint8_t port = digitalPinToPort(pin);
+    unsigned char pin = toArduinoPin(bank, id);
+    unsigned char timer = digitalPinToTimer(pin);
+    unsigned char bit = digitalPinToBitMask(pin);
+    unsigned char port = digitalPinToPort(pin);
 
     if (port == 0) return false;
 

@@ -20,6 +20,7 @@
 #define portModeRegister(P) \
     ((volatile uint8_t *)(pgm_read_word(port_to_mode_PGM + (P))))
 
+
 namespace os {
 namespace gpio {
 
@@ -56,7 +57,7 @@ void analogWrite(PinBank bank, unsigned int id, int output);
 int analogRead(PinBank bank, unsigned int id);
 
 // Convert pin numbers to arduino-style pins
-uint8_t toArduinoPin(PinBank bank, unsigned int id);
+unsigned char toArduinoPin(PinBank bank, unsigned int id);
 
 }  // namespace pin
 }  // namespace gpio

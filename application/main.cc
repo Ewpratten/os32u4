@@ -1,8 +1,13 @@
 #include <ledblink.hh>
+
+#include <avr/interrupt.h>
+
 #include <os32u4/gpio/pin.hh>
 #include <os32u4/process/procd.hh>
 #include <os32u4/process/process.hh>
 #include <os32u4/uart/uart.hh>
+
+bool hasBooted = false;
 
 void sysInit() {
     // Init UART registers on-board
@@ -17,7 +22,7 @@ void sysInit() {
     puts("Hooked into STDIO");
 }
 
-void startProc(os::process::Process* p) {
+inline void startProc(os::process::Process* p) {
     int pid = os::process::scheduler::start(p);
 
     if (pid != -1) {
@@ -31,9 +36,19 @@ void procInit() {
     puts("Starting system processes");
 
     startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 9, 0.5));
+    startProc(new LEDBlinkProc(os::gpio::PinBank::kDigital, 8, 0.25));
 }
 
 int main(int argc, char const* argv[]) {
+    // SEI
+    sei();
+
+    // Handle boot wipe
+    if(hasBooted){
+        return 0;
+    }
+    hasBooted = true;
+
     // Run system init
     sysInit();
 
@@ -42,18 +57,10 @@ int main(int argc, char const* argv[]) {
 
     bool ledVal = true;
     for (;;) {
-        // os::util::delay::delayMS(500);
-        // ledVal = !ledVal;
-        // printf("Pin 9 set %s\n", (ledVal) ? "HIGH" : "LOW");
-        // os::gpio::pin::binaryWrite(os::gpio::PinBank::kDigital, 9, ledVal);
 
         // Run an interation of the scheduler
         os::process::scheduler::runIteration();
     }
 
-    // Do nothing (this is just to keep the system running)
-    puts("System idle");
-    for (;;) {
-    }
     return 0;
 }

@@ -1,10 +1,13 @@
 #include <os32u4/process/procd.hh>
 #include <vendor/millis/millis.hh>
+#include <string.h>
+#include <stdio.h>
+#include <avr/interrupt.h>
 
 // Info for keeping track of process execution
-struct ProcInfo {
+typedef struct ProcInfo {
     os::process::Process* proc;
-    double lastCallTimeSecs;
+    double lastCallTime;
     bool frozen;
     bool finished;
 };
@@ -21,16 +24,24 @@ void runIteration() {
     // Loop through every process
     for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
         // If the process is allowed to run
-        if (!processes[i].finished && !processes[i].frozen) {
+        if (!processes[i].finished && !processes[i].frozen && i < EOP) {
+
             // If this is the first run, init the process
-            if (processes[i].lastCallTimeSecs == 0.0) {
+            if (!(bool)processes[i].proc->initialized) {
+                processes[i].proc->initialized = true;
                 processes[i].proc->init();
             }
 
+            // puts("Ini");
+            // Handle starting the timer service if the user forgets
+            if(millis_get() == 0.0){
+                millis_init();
+            }
+
             // Calculate time since last run
-            double secsNow = millis_get() / 1000;
-            double dt = processes[i].lastCallTimeSecs - secsNow;
-            processes[i].lastCallTimeSecs = secsNow;
+            millis_t now = millis_get();
+            unsigned long dt = processes[i].lastCallTime - now;
+            processes[i].lastCallTime = now;
 
             // Run an iteration of the process
             processes[i].proc->runIteration(dt);
@@ -51,6 +62,7 @@ int start(process::Process* proc) {
     int slot = -1;
     if (EOP < MAX_PROCESS_COUNT) {
         slot = EOP;
+        EOP++;
     } else {
         // Find if any processes are finished
         for (int i = 0; i < MAX_PROCESS_COUNT; i++) {
@@ -65,12 +77,18 @@ int start(process::Process* proc) {
         return -1;
     }
 
+    // If this is the first process, we need to wipe the entire process array
+    if(slot == 0){
+        memset(processes, 0, sizeof(struct ProcInfo));
+    }
+
     // Set the process slot
     ProcInfo pi;
     pi.proc = proc;
     pi.finished = false;
     pi.frozen = false;
-    pi.lastCallTimeSecs = 0.0;
+    pi.lastCallTime = 0.0;
+    pi.proc->initialized = false;
     processes[slot] = pi;
 
     // Give the process a pid
