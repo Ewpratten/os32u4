@@ -19,17 +19,23 @@ CXX=avr-g++
 
 ###### END CONFIGURATION ######
 
-CPPFLAGS=-DF_CPU=$(avrFreq) -D $(clibtype) -mmcu=$(avrType) -Iinclude -DBAUD=$(commsBaud) -std=c++11  -g -Os -w  -fdata-sections -MMD -flto
-LINKFLAGS=-w -Os -g -flto -fuse-linker-plugin -Wl,--gc-sections -mmcu=$(avrType) -Iinclude -std=c++11 -DF_CPU=$(avrFreq)
+common_flags=-DMILLIS_TIMER=1 -mmcu=$(avrType) -Iinclude -Iapplication/include -std=c++11  -DF_CPU=$(avrFreq) -w -Os -g -flto -DBAUD=$(commsBaud)
+CPPFLAGS=-D $(clibtype)   -std=c++11 -lang-c++  -fdata-sections -MMD $(common_flags)
+ASMFLAGS=-x assembler-with-cpp
+LINKFLAGS= -fuse-linker-plugin -Wl,--gc-sections  $(common_flags)
 # -Wall -Werror -Wextra 
-objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) os32u4/**/*.cc
+objects=$(patsubst %.cc,%.o,$(wildcard *.cc)) os32u4/**/*.cc application/*.cc vendor/**/*.cc
+sobjects= os32u4/**/*.s
 
 .PHONY: flash clean
 
 all: build/main.hex
 
-%.o: %.c
+%.o: %.cc
 	$(CXX) $(CPPFLAGS) -c $< -o $@
+
+%.o: %.s
+	$(CXX) $(CPPFLAGS) $(ASMFLAGS) -c $< -o $@
 
 build/main.elf: $(objects)
 	$(CXX) $(LINKFLAGS) -o $@ $^ 
