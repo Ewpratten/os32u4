@@ -32,18 +32,19 @@ void SingleSevenSegment::setRaw(uint8_t data) {
     this->raw = raw;
 
     // Send data to shift register
+    os::gpio::pin::binaryWrite(this->latchPin, false);
     os::gpio::shiftregister::send(this->dataPin, this->clkPin,
                                   os::gpio::shiftregister::ByteOrder::kMSB,
                                   this->raw);
+    os::gpio::pin::binaryWrite(this->latchPin, true);
 }
 
-void SingleSevenSegment::updateDisplay(){
-
+void SingleSevenSegment::updateDisplay() {
     // Get the appropriate bitmask for the number
     uint8_t mask = digits[this->number];
 
     // Set the decimal if needed
-    if(this->decimal){
+    if (this->decimal) {
         mask |= 0b10000000;
     }
 
