@@ -1,0 +1,12 @@
+{
+    "configurations": [
+        {
+            "name": "avr-linux",
+            "includePath": [
+                "/usr/lib/avr/include",
+                "${workspaceFolder}/**"
+            ]
+        }
+    ],
+    "version": 4
+}
