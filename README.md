@@ -1,5 +1,29 @@
 # os32u4
-A Kernel for use on 32u4 AVR chips
+A Kernel for use on 32u4 AVR chips.
+
+This project exists to provide a low-level hardware library to help me program ATmega32u4-based μControllers. Currently, library features include:
+ - Digital GPIO
+ - Precise & fuzzy timekeeping
+ - Timeshare-based multithreading with up to 10 threads 
+   - Capibilities for IPC, task management, and freezing threads
+   - Easy-to-use interface
+   - Low resource usage
+ - Support for interacting with 8-bit shift registers
+ - Hardware USART with support for redirecting stdio over USART
+ - A single-digit 7-segment display driver
+
+All code except `vendor` code has been written by [me](https://retrylife.ca), by hand. I am using this project to help me learn my way arount the AVR ISA.
+
+## Testbed
+
+![My test setup](./project.jpg)
+
+I am currently developing this library / kernel with the following:
+ - Arduino Pro Micro (16mhz 5V)
+ - Generic USB-FTDI converter
+ - 8bit shift register
+ - 7 segment display
+ - A few LEDs
 
 ## Timers
 

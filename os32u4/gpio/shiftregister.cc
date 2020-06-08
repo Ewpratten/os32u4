@@ -1,5 +1,7 @@
 #include <os32u4/gpio/shiftregister.hh>
 
+#include <os32u4/util/delay.hh>
+
 namespace os {
 namespace gpio {
 namespace shiftregister {

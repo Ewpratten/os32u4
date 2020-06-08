@@ -1,7 +1,7 @@
-#include <ledblink.hh>
-
 #include <avr/interrupt.h>
 
+#include <7segtest.hh>
+#include <ledblink.hh>
 #include <os32u4/gpio/pin.hh>
 #include <os32u4/process/procd.hh>
 #include <os32u4/process/process.hh>
@@ -27,16 +27,22 @@ inline void startProc(os::process::Process* p) {
 
     if (pid != -1) {
         printf("Started process %d\n", pid);
-    }else{
+    } else {
         puts("Process failed to start. Too many processes running");
     }
 }
 
 void procInit() {
+    using namespace os::gpio;
     puts("Starting system processes");
 
-    startProc(new LEDBlinkProc(os::gpio::Pin{os::gpio::PinBank::kDigital, 9}, 500l));
-    startProc(new LEDBlinkProc(os::gpio::Pin{os::gpio::PinBank::kDigital, 8}, 250l));
+    startProc(new LEDBlinkProc(Pin{PinBank::kDigital, 9}, 500l));
+    startProc(new LEDBlinkProc(Pin{PinBank::kDigital, 8}, 250l));
+
+    // Set up 7seg test process
+    startProc(new SingleSevenSegTest(Pin{PinBank::kDigital, 14},
+                                     Pin{PinBank::kDigital, 15},
+                                     Pin{PinBank::kDigital, 16}, 1000l));
 }
 
 int main(int argc, char const* argv[]) {
@@ -45,7 +51,7 @@ int main(int argc, char const* argv[]) {
     sei();
 
     // Handle boot wipe
-    if(hasBooted){
+    if (hasBooted) {
         return 0;
     }
     hasBooted = true;
@@ -58,7 +64,6 @@ int main(int argc, char const* argv[]) {
 
     bool ledVal = true;
     for (;;) {
-
         // Run an interation of the scheduler
         os::process::scheduler::runIteration();
     }
