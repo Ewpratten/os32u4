@@ -5,10 +5,10 @@ namespace os {
 namespace gpio {
 namespace pin {
 
-void configure(PinBank bank, unsigned int id, PinMode mode) {
-    unsigned char pin = toArduinoPin(bank, id);
-    unsigned char bit = digitalPinToBitMask(pin);
-    unsigned char port = digitalPinToPort(pin);
+void configure(const Pin &pin, PinMode mode) {
+    unsigned char _pin = toArduinoPin(pin);
+    unsigned char bit = digitalPinToBitMask(_pin);
+    unsigned char port = digitalPinToPort(_pin);
     volatile unsigned char *reg, *out;
 
     if (port == 0) return;
@@ -37,11 +37,11 @@ void configure(PinBank bank, unsigned int id, PinMode mode) {
     }
 }
 
-void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
-    unsigned char pin = toArduinoPin(bank, id);
-    unsigned char timer = digitalPinToTimer(pin);
-    unsigned char bit = digitalPinToBitMask(pin);
-    unsigned char port = digitalPinToPort(pin);
+void binaryWrite(const Pin &pin, bool enabled) {
+    unsigned char _pin = toArduinoPin(pin);
+    unsigned char timer = digitalPinToTimer(_pin);
+    unsigned char bit = digitalPinToBitMask(_pin);
+    unsigned char port = digitalPinToPort(_pin);
     volatile unsigned char *out;
 
     if (port == 0) return;
@@ -65,11 +65,11 @@ void binaryWrite(PinBank bank, unsigned int id, bool enabled) {
     SREG = oldSREG;
 }
 
-bool binaryRead(PinBank bank, unsigned int id) {
-    unsigned char pin = toArduinoPin(bank, id);
-    unsigned char timer = digitalPinToTimer(pin);
-    unsigned char bit = digitalPinToBitMask(pin);
-    unsigned char port = digitalPinToPort(pin);
+bool binaryRead(const Pin &pin) {
+    unsigned char _pin = toArduinoPin(pin);
+    unsigned char timer = digitalPinToTimer(_pin);
+    unsigned char bit = digitalPinToBitMask(_pin);
+    unsigned char port = digitalPinToPort(_pin);
 
     if (port == 0) return false;
 

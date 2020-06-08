@@ -4,11 +4,11 @@ namespace os {
 namespace gpio {
 namespace pin {
 
-unsigned char toArduinoPin(PinBank bank, unsigned int id) {
-    if (bank == PinBank::kAnalog) {
-        return A0 + id;
+unsigned char toArduinoPin(const Pin &pin) {
+    if (pin.bank == PinBank::kAnalog) {
+        return A0 + pin.channel;
     } else {
-        return id;
+        return pin.channel;
     }
 }
 

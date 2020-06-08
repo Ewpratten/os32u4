@@ -24,14 +24,17 @@
 namespace os {
 namespace gpio {
 
+// Pin data
+enum class PinMode { kInput = 0x00, kOutput = 0x01, kInputPullup = 0x02 };
+enum class PinBank { kAnalog = 0, kDigital = 1 };
+
+// Pin
 typedef struct Pin {
     PinBank bank;
     uint8_t channel;
 };
 
-// Pin data
-enum class PinMode { kInput = 0x00, kOutput = 0x01, kInputPullup = 0x02 };
-enum class PinBank { kAnalog = 0, kDigital = 1 };
+
 
 // Reference voltages
 enum class ReferenceVoltage {
@@ -50,19 +53,19 @@ namespace pin {
  * @param id Pin id
  * @param mode Pin I/O mode
  */
-void configure(Pin *pin, PinMode mode);
+void configure(const Pin &pin, PinMode mode);
 
 // Binary I/O
-void binaryWrite(Pin *pin, bool enabled);
-bool binaryRead(Pin *pin);
+void binaryWrite(const Pin &pin, bool enabled);
+bool binaryRead(const Pin &pin);
 
 // Analog I/O
 void setBoardReference(ReferenceVoltage voltage);
-void analogWrite(Pin *pin, int output);
-int analogRead(Pin *pin);
+void analogWrite(const Pin &pin, int output);
+int analogRead(const Pin &pin);
 
 // Convert pin numbers to arduino-style pins
-unsigned char toArduinoPin(Pin *pin);
+unsigned char toArduinoPin(const Pin &pin);
 
 }  // namespace pin
 }  // namespace gpio
