@@ -8,15 +8,14 @@
 // A test process that flashes a light
 class LEDBlinkProc: public os::process::Process {
     public:
-     LEDBlinkProc(os::gpio::PinBank, unsigned int, unsigned long);
+     LEDBlinkProc(const os::gpio::Pin&, unsigned long);
      void init() override;
      void runIteration(unsigned long) override;
      bool isFinished() override { return false; }
      void end() override {}
 
     private:
-     os::gpio::PinBank bank;
-     unsigned int pin;
+     os::gpio::Pin pin;
      bool value;
      double delay;
      double lastBlinkTime = 0.0;

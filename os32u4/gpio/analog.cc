@@ -13,18 +13,18 @@ void setBoardReference(ReferenceVoltage voltage) {
     analog_reference = (uint8_t)voltage;
 }
 
-void analogWrite(PinBank bank, unsigned int id, int output) {
+void analogWrite(const Pin &pin, int output) {
     // Currently, we don't support board timers, so PWM is not possible
     // TODO: Add PWM once timers are available
 
     if (output == 0) {
-        binaryWrite(bank, id, false);
+        binaryWrite(pin, false);
     } else {
-        binaryWrite(bank, id, true);
+        binaryWrite(pin, true);
     }
 }
 
-int analogRead(PinBank bank, unsigned int id) { return 0; }
+int analogRead(const Pin &pin) { return 0; }
 
 }  // namespace pin
 }  // namespace gpio

@@ -1,8 +1,7 @@
 #include <ledblink.hh>
 
 
-LEDBlinkProc::LEDBlinkProc(os::gpio::PinBank bank, unsigned int pin, unsigned long delay_msec) {
-    this->bank = bank;
+LEDBlinkProc::LEDBlinkProc(const os::gpio::Pin &pin, unsigned long delay_msec) {
     this->pin = pin;
     this->delay = delay_msec;
 
@@ -11,13 +10,13 @@ LEDBlinkProc::LEDBlinkProc(os::gpio::PinBank bank, unsigned int pin, unsigned lo
 void LEDBlinkProc::init()  {
     // Configure pin
     printf("Configuring %s pin %d for output\n",
-           (this->bank == os::gpio::PinBank::kAnalog) ? "analog" : "digital",
-           this->pin);
-    os::gpio::pin::configure(this->bank, this->pin, os::gpio::PinMode::kOutput);
+           (this->pin.bank == os::gpio::PinBank::kAnalog) ? "analog" : "digital",
+           this->pin.channel);
+    os::gpio::pin::configure(this->pin, os::gpio::PinMode::kOutput);
 
     // Pull the pin HIGH
-    printf("Pulling pin %d HIGH\n", this->pin);
-    os::gpio::pin::binaryWrite(this->bank, this->pin, true);
+    printf("Pulling pin %d HIGH\n", this->pin.channel);
+    os::gpio::pin::binaryWrite(this->pin, true);
     this->value = true;
 }
 
@@ -37,8 +36,8 @@ void LEDBlinkProc::runIteration(unsigned long dt)  {
     this->value = !this->value;
 
     // Log
-    printf("Pin %d set %s\n", this->pin, (this->value) ? "HIGH" : "LOW");
+    printf("Pin %d set %s\n", this->pin.channel, (this->value) ? "HIGH" : "LOW");
 
     // Write to pin
-    os::gpio::pin::binaryWrite(this->bank, this->pin, this->value);
+    os::gpio::pin::binaryWrite(this->pin, this->value);
 }

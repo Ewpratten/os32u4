@@ -5,6 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
+#include <stdint.h>
 #include <vendor/promicro/pins_arduino.h>
 
 // These are derived from Arduino.h
@@ -20,13 +21,20 @@
 #define portModeRegister(P) \
     ((volatile uint8_t *)(pgm_read_word(port_to_mode_PGM + (P))))
 
-
 namespace os {
 namespace gpio {
 
 // Pin data
 enum class PinMode { kInput = 0x00, kOutput = 0x01, kInputPullup = 0x02 };
 enum class PinBank { kAnalog = 0, kDigital = 1 };
+
+// Pin
+typedef struct Pin {
+    PinBank bank;
+    uint8_t channel;
+};
+
+
 
 // Reference voltages
 enum class ReferenceVoltage {
@@ -45,19 +53,19 @@ namespace pin {
  * @param id Pin id
  * @param mode Pin I/O mode
  */
-void configure(PinBank bank, unsigned int id, PinMode mode);
+void configure(const Pin &pin, PinMode mode);
 
 // Binary I/O
-void binaryWrite(PinBank bank, unsigned int id, bool enabled);
-bool binaryRead(PinBank bank, unsigned int id);
+void binaryWrite(const Pin &pin, bool enabled);
+bool binaryRead(const Pin &pin);
 
 // Analog I/O
 void setBoardReference(ReferenceVoltage voltage);
-void analogWrite(PinBank bank, unsigned int id, int output);
-int analogRead(PinBank bank, unsigned int id);
+void analogWrite(const Pin &pin, int output);
+int analogRead(const Pin &pin);
 
 // Convert pin numbers to arduino-style pins
-unsigned char toArduinoPin(PinBank bank, unsigned int id);
+unsigned char toArduinoPin(const Pin &pin);
 
 }  // namespace pin
 }  // namespace gpio
