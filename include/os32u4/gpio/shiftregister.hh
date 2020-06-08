@@ -9,10 +9,7 @@ namespace os {
 namespace gpio {
 namespace shiftregister {
 
-enum class ByteOrder {
-    kMSB,
-    kLSB
-}
+enum class ByteOrder { kMSB, kLSB };
 
 void send(const Pin &dataPin, const Pin &clkPin, ByteOrder order, uint8_t data);
 uint8_t recv(const Pin &dataPin, const Pin &clkPin, ByteOrder order);
